@@ -1,0 +1,26 @@
+# General
+*.swp
+
+# Chisel
+lint.rpt
+error.rpt
+ipf.rpt
+project/*
+!/project/build.properties
+!/project/plugins.sbt
+modules/*/generated/*
+modules/*/target/*
+modules/*/.scala-build/*
+target/*
+./ipf/*
+!./ipf.json
+!./ipf.pdf
+
+
+# Visual Studio
+.vscode
+.metals
+.bloop
+.bsp
+
+
