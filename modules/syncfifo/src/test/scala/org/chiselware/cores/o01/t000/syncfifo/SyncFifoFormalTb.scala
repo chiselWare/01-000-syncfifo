@@ -1,16 +1,16 @@
-// (c) <year> <your name or company>
+// (c) 2026 Rocksavage Technology, Inc.
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o00.t000.dff
+package org.chiselware.cores.o01.t000.syncfifo
 
 import chisel3._
 import chiseltest.formal._
 
-/** Formal testbench for Dff.
+/** Formal testbench for SyncFifo.
   *
   * chiselWare formal testbench pattern: properties live here, not in production
-  * RTL. Analogous to DffTb for simulation. See the chiselWare Developer's Guide
-  * for a full explanation of the methodology.
+  * RTL. Analogous to SyncFifoTb for simulation. See the chiselWare Developer's
+  * Guide for a full explanation of the methodology.
   *
   * Temporal primitives available via `import chiseltest.formal._`: past(sig) —
   * value of sig one cycle ago (SVA: $past) rose(sig) — true when sig
@@ -24,9 +24,9 @@ import chiseltest.formal._
   * CWS named parameter rule does not apply to these three.
   *
   * @param p
-  *   DffParams — same parameterization as the DUT
+  *   SyncFifoParams — same parameterization as the DUT
   */
-class DffFormalTb(p: DffParams) extends Module {
+class SyncFifoFormalTb(p: SyncFifoParams) extends Module {
 
   /** Wrapper IO — formal tool drives these as free variables. Required: FIRRTL
     * rejects undriven (VOID) DUT inputs.
@@ -36,7 +36,7 @@ class DffFormalTb(p: DffParams) extends Module {
     val enable = Input(Bool())
   })
 
-  val dut = Module(new Dff(p))
+  val dut = Module(new SyncFifo(p))
   dut.io.d := io.d
   dut.io.enable := io.enable
 

@@ -1,4 +1,4 @@
-Copyright (c) <year> <Your Name or Organization>
+Copyright (c) 2026 Rocksavage Technology, Inc.
 
 Apache License
 ==============

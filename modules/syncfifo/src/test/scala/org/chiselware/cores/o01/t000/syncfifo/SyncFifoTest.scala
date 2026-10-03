@@ -1,7 +1,7 @@
-// (c) <year> <your name or company>
+// (c) 2026 Rocksavage Technology, Inc.
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o00.t000.dff
+package org.chiselware.cores.o01.t000.syncfifo
 
 import chisel3._
 import chiseltest._
@@ -11,10 +11,11 @@ import org.scalatest.matchers.should.Matchers
 
 import java.io.File
 
-class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
+class SyncFifoTest extends AnyFlatSpec with Matchers
+    with ChiselScalatestTester {
 
   // Execute the main test for each configuration
-  for ((configName, config) <- DffParams.simConfigMap) {
+  for ((configName, config) <- SyncFifoParams.simConfigMap) {
     main(configName = configName, p = config)
   }
 
@@ -25,16 +26,19 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
   behavior of "Configuration assertions"
   it should "throw an assertion when dataWidth parameter is less than 1" in {
     val widthErr = assertThrows[IllegalArgumentException] {
-      DffParams(
+      SyncFifoParams(
         width = 0
       )
     }
   }
 
   /** Main test function executes one complete test for one configuration */
-  def main(configName: String, p: DffParams): Unit = {
+  def main(
+      configName: String,
+      p: SyncFifoParams
+    ): Unit = {
 
-    behavior of s"Dff directed tests (config: $configName)"
+    behavior of s"SyncFifo directed tests (config: $configName)"
 
     val backendAnnotations = Seq(
       // WriteVcdAnnotation,
@@ -46,7 +50,7 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
     )
 
     it should "perform these tests successfully " in {
-      test(new DffTb(p))
+      test(new SyncFifoTb(p))
         .withAnnotations(annotationSeq = backendAnnotations) { dut =>
           dut.clock.setTimeout(0)
           // Initialize the inputs

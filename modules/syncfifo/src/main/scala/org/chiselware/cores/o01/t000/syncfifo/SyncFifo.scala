@@ -1,38 +1,34 @@
-// (c) <year> <your name or company>
+// (c) 2026 Rocksavage Technology, Inc.
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o00.t000.dff
+package org.chiselware.cores.o01.t000.syncfifo
 
 import _root_.circt.stage.ChiselStage
 import chisel3._
 import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
 import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
 
-/** A D-Flip-Flop with asynchronous reset
+/** Synchronous FIFO with asynchronous reset
   *
   * @constructor
-  *   create a new Dff
+  *   create a new SyncFifo
   * @param width
-  *   defines the data width of the Dff
+  *   defines the data width of the SyncFifo
   * @author
   *   Warren Savage
   * @todo
   *
   * @see
-  *   [[http://www.yourcompany.com]] for more information.
+  *   [[http://www.rocksavage.tech]] for more information.
   *
   * <img src="doc/images/user-guide/dff-block-diagram.png" />
   */
 
-/** Companion object to allow factory method instantiation, such as myDff =
-  * Dff(width = 8)
-  */
-
-object Dff {
-  def apply(params: DffParams): Dff = Module(new Dff(params))
+object SyncFifo {
+  def apply(params: SyncFifoParams): SyncFifo = Module(new SyncFifo(params))
 }
 
-class Dff(p: DffParams) extends Module {
+class SyncFifo(p: SyncFifoParams) extends Module {
   val io = IO(new Bundle {
     val d = Input(UInt(p.width.W))
     val q = Output(UInt(p.width.W))
@@ -52,9 +48,9 @@ class Dff(p: DffParams) extends Module {
   * part of the regression framework.
   */
 object Main extends App {
-  val coreDir = s"modules/${DffParams.MainClassName.toLowerCase()}"
+  val coreDir = s"modules/${SyncFifoParams.MainClassName.toLowerCase()}"
 
-  DffParams.synConfigMap.foreach { case (configName, configParams) =>
+  SyncFifoParams.synConfigMap.foreach { case (configName, configParams) =>
     val myOpts = Array(
       "--lowering-options=disallowLocalVariables,disallowPackedArrays",
       "--disable-all-randomization",
@@ -65,7 +61,7 @@ object Main extends App {
     println()
     println(s"Generating Verilog for config: $configName")
     ChiselStage.emitSystemVerilog(
-      gen = new Dff(p = configParams),
+      gen = new SyncFifo(p = configParams),
       firtoolOpts = myOpts
     )
 
@@ -75,16 +71,16 @@ object Main extends App {
       sdcFilePath = s"${coreDir}/generated/synTestCases/$configName"
     )
     YosysTclFile.create(
-      mainClassName = DffParams.MainClassName,
+      mainClassName = SyncFifoParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     StaTclFile.create(
-      mainClassName = DffParams.MainClassName,
+      mainClassName = SyncFifoParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     RunScriptFile.create(
-      mainClassName = DffParams.MainClassName,
-      configs = DffParams.synConfigs,
+      mainClassName = SyncFifoParams.MainClassName,
+      configs = SyncFifoParams.synConfigs,
       runDir = s"${coreDir}/generated/synTestCases"
     )
   }
@@ -105,10 +101,10 @@ object Main extends App {
   */
 object GenVerWithParamCli extends App {
   val p = ParamCli.parseParams(args)
-  val params = DffParams.fromMap(p)
+  val params = SyncFifoParams.fromMap(p)
 
   ChiselStage.emitSystemVerilog(
-    new Dff(params),
+    new SyncFifo(params),
     firtoolOpts = Array(
       "--lowering-options=disallowLocalVariables,disallowPackedArrays",
       "--disable-all-randomization",
@@ -125,7 +121,7 @@ object GenVerWithParamCli extends App {
 
   IpfJsonFile.create(
     p = IpfParamsMap.params,
-    jsonFilePath = s".ipf/${DffParams.MainClassName}.json"
+    jsonFilePath = s".ipf/${SyncFifoParams.MainClassName}.json"
   )
 
 }

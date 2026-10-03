@@ -1,25 +1,25 @@
-// (c) <year> <your name or company>
+// (c) 2026 Rocksavage Technology, Inc.
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o00.t000.dff
+package org.chiselware.cores.o01.t000.syncfifo
 
 import org.chiselware.ipf.{ FieldType, IpfParams }
 
 import java.io.{ File, PrintWriter }
 import scala.collection.mutable.LinkedHashMap
 
-/** Default parameter settings for Dff
+/** Default parameter settings for SyncFifo
   *
   * @constructor
   *   default parameter settings
   * @param width
-  *   specifies the width of the Dff
+  *   specifies the width of the SyncFifo
   * @author
   *   Warren Savage
   * @see
   *   [[http://www.mycompany.com]] for more information
   */
-case class DffParams(
+case class SyncFifoParams(
     width: Int = 1) {
   val widthMsg = "width must be greater than or equal 1"
   require(width >= 1, widthMsg)
@@ -38,30 +38,30 @@ case class DffParams(
   *  convention.
   * ```
   */
-object DffParams {
-  val MainClassName = "Dff"
-  val simConfigMap = LinkedHashMap[String, DffParams](
-    "config8" -> DffParams(width = 8),
-    "config32" -> DffParams(width = 32),
-    "config64" -> DffParams(width = 64)
+object SyncFifoParams {
+  val MainClassName = "SyncFifo"
+  val simConfigMap = LinkedHashMap[String, SyncFifoParams](
+    "config8" -> SyncFifoParams(width = 8),
+    "config32" -> SyncFifoParams(width = 32),
+    "config64" -> SyncFifoParams(width = 64)
   )
 
-  val synConfigMap = LinkedHashMap[String, DffParams](
-    "small_1" -> DffParams(width = 1),
-    "medium_64" -> DffParams(width = 64),
-    "large_128" -> DffParams(width = 128)
+  val synConfigMap = LinkedHashMap[String, SyncFifoParams](
+    "small_1" -> SyncFifoParams(width = 1),
+    "medium_64" -> SyncFifoParams(width = 64),
+    "large_128" -> SyncFifoParams(width = 128)
   )
 
   // Extract config names into a space-separated string
-  val synConfigs = DffParams.synConfigMap
+  val synConfigs = SyncFifoParams.synConfigMap
     .map { case (configName, config) => s"$configName" }
     .mkString(" ")
 
   // Package parameter names for import to IP Factory
-  def fromMap(m: Map[String, String]): DffParams = {
+  def fromMap(m: Map[String, String]): SyncFifoParams = {
     val width = m.get("width").map(_.toInt).getOrElse(1)
     // add all additional synthesis parameters here
-    DffParams(width = width) // extend with more params as needed
+    SyncFifoParams(width = width) // extend with more params as needed
   }
 }
 
@@ -70,7 +70,7 @@ object DffParams {
   */
 object SdcFile {
   def create(
-      p: DffParams,
+      p: SyncFifoParams,
       sdcFilePath: String
     ): Unit = {
     // Default constraints, tighten or loosen as necessary
@@ -96,7 +96,7 @@ object SdcFile {
     println(s"Writing SDC file to $sdcFilePath")
     val sdcFileDir = new File(sdcFilePath)
     sdcFileDir.mkdirs()
-    val sdcFileName = new File(s"$sdcFilePath/Dff.sdc")
+    val sdcFileName = new File(s"$sdcFilePath/SyncFifo.sdc")
     val sdcFile = new PrintWriter(sdcFileName)
     sdcFile.write(s"${sdcFileData}")
     sdcFile.close()
@@ -110,7 +110,7 @@ object IpfParamsMap {
       IpfParams(
         fieldType = FieldType.Field,
         pickList = List.empty,
-        message = Some(DffParams().widthMsg)
+        message = Some(SyncFifoParams().widthMsg)
         // add remaining parameters as needed, here are some examples
         // "useFifo" -> IpfParams(FieldType.Toggle, List.empty, None),
         // "cacheSize" -> IpfParams(FieldType.Pick, List("32", "64", "128"), None)

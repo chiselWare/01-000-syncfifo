@@ -1,7 +1,7 @@
-// (c) <year> <your name or company>
+// (c) 2026 Rocksavage Technology, Inc.
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o00.t000.dff
+package org.chiselware.cores.o01.t000.syncfifo
 
 import chiseltest._
 import chiseltest.formal._
@@ -17,25 +17,26 @@ import org.scalatest.flatspec.AnyFlatSpec
   */
 object FormalTest extends Tag("FormalTest")
 
-/** Formal test spec for Dff.
+/** Formal test spec for SyncFifo.
   *
   * BoundedCheck(k): BMC for k cycles after reset. Increase for deeper cores.
   *
   * Runs across all simConfigMap entries — one property set, all configs
   */
-class DffFormalTest extends AnyFlatSpec with ChiselScalatestTester with Formal {
+class SyncFifoFormalTest extends AnyFlatSpec with ChiselScalatestTester
+    with Formal {
 
   val bound = BoundedCheck(10)
 
-  behavior of "Dff formal"
+  behavior of "SyncFifo formal"
 
-  for ((configName, config) <- DffParams.simConfigMap) {
+  for ((configName, config) <- SyncFifoParams.simConfigMap) {
     it should s"pass all formal properties ($configName)" taggedAs FormalTest in {
       verify(
-        new DffFormalTb(config),
+        new SyncFifoFormalTb(config),
         Seq(
           bound,
-          TargetDirAnnotation(s"modules/dff/generated/formal/$configName")
+          TargetDirAnnotation(s"modules/syncfifo/generated/formal/$configName")
         )
       )
     }
