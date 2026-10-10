@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] - yyyy-mm-dd
+## [1.0.0] - 2026-10-10
 ### Added
 - Initial release (port of DynamicFifo)
 ### Fixed

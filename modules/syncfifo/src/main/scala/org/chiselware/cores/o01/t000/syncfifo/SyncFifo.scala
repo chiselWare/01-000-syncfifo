@@ -1,47 +1,87 @@
-// (c) 2026 Rocksavage Technology, Inc.
-// This code is licensed under the <name of license> (see LICENSE.MD)
+// SPDX-FileCopyrightText: Rocksavage Technology, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 package org.chiselware.cores.o01.t000.syncfifo
 
 import _root_.circt.stage.ChiselStage
 import chisel3._
+import chisel3.util._
 import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
 import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
-
-/** Synchronous FIFO with asynchronous reset
-  *
-  * @constructor
-  *   create a new SyncFifo
-  * @param width
-  *   defines the data width of the SyncFifo
-  * @author
-  *   Warren Savage
-  * @todo
-  *
-  * @see
-  *   [[http://www.rocksavage.tech]] for more information.
-  *
-  * <img src="doc/images/user-guide/dff-block-diagram.png" />
-  */
 
 object SyncFifo {
   def apply(params: SyncFifoParams): SyncFifo = Module(new SyncFifo(params))
 }
 
+/** A synchronous FIFO and FIFO controller with dynamic flags
+  *
+  * <img src="SyncFifo-blockdiagram.png" />
+  *
+  * @constructor
+  *   create a new FIFO or FIFO controller
+  * @param externalRam
+  *   creates just the FIFO controller (uses ext. SRAM)
+  * @param dataWidth
+  *   defines the data width of the FIFO
+  * @param fifoDepth
+  *   defines the depth of the FIFO (must be a power of 2)
+  * @author
+  *   Warren Savage
+  * @see
+  *   [[http://www.rocksavage.tech/]] for more information
+  */
+
 class SyncFifo(p: SyncFifoParams) extends Module {
+
   val io = IO(new Bundle {
-    val d = Input(UInt(p.width.W))
-    val q = Output(UInt(p.width.W))
-    val enable = Input(Bool())
+    val push = Input(Bool())
+    val pop = Input(Bool())
+    val dataIn = Input(UInt(p.dataWidth.W))
+    val dataOut = Output(UInt(p.dataWidth.W))
+    val empty = Output(Bool())
+    val full = Output(Bool())
+    val almostEmpty = Output(Bool())
+    val almostFull = Output(Bool())
+    val almostEmptyLevel = Input(UInt(log2Ceil(p.fifoDepth).W))
+    val almostFullLevel = Input(UInt(log2Ceil(p.fifoDepth).W))
+    val ramWriteEnable = Output(Bool())
+    val ramWriteAddress = Output(UInt(log2Ceil(p.fifoDepth).W))
+    val ramDataIn = Output(UInt(p.dataWidth.W))
+    val ramReadEnable = Output(Bool())
+    val ramReadAddress = Output(UInt(log2Ceil(p.fifoDepth).W))
+    val ramDataOut = Input(UInt(p.dataWidth.W))
   })
 
-  val q = RegInit(0.U(p.width.W))
+  val fifoMemory = RegInit(VecInit(Seq.fill(p.fifoDepth)(0.U(p.dataWidth.W))))
 
-  when(io.enable) {
-    q := io.d
+  val tail = RegInit(0.U(log2Ceil(p.fifoDepth + 1).W))
+  val head = RegInit(0.U(log2Ceil(p.fifoDepth + 1).W))
+  val count = RegInit(0.U(log2Ceil(p.fifoDepth + 1).W))
+
+  when((io.push === 1.U) && (io.full =/= 1.U)) { count := count + 1.U }
+  when((io.pop === 1.U) && (io.empty =/= 1.U)) { count := count - 1.U }
+  when((io.pop === 1.U) && (io.push === 1.U)) { count := count }
+
+  io.empty := count === 0.U
+  io.full := count === p.fifoDepth.U
+  io.almostEmpty := count <= io.almostEmptyLevel
+  io.almostFull := count >= io.almostFullLevel
+
+  when(io.pop && !io.empty) {
+    tail := (tail + 1.U)
   }
 
-  io.q := q
+  when(io.push && !io.full) {
+    fifoMemory(head) := io.dataIn
+    head := (head + 1.U)
+  }
+
+  io.dataOut := Mux(p.externalRam.B, io.ramDataOut, fifoMemory(tail))
+  io.ramDataIn := io.dataIn
+  io.ramReadAddress := tail
+  io.ramWriteAddress := head
+  io.ramReadEnable := io.pop
+  io.ramWriteEnable := io.push
 }
 
 /** Generate Verilog and related collateral for each configuration to be used as

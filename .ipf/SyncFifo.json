@@ -1,0 +1,16 @@
+[ {
+  "name" : "datawidth",
+  "type" : "field",
+  "value" : null,
+  "requirement" : "Width must be greater than or equal 4"
+}, {
+  "name" : "fifoDepth",
+  "type" : "field",
+  "value" : null,
+  "requirement" : "Depth must be a power of 2"
+}, {
+  "name" : "externalRam",
+  "type" : "toggle",
+  "value" : null,
+  "requirement" : null
+} ]

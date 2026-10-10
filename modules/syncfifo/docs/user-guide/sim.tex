@@ -1,24 +1,26 @@
 \section{Simulation}
 
 \subsection{Tests}
-The included test bench tests 3 configurations of the Dff. More configurations can be added as desired. For each configuration,
-random data is applied to the inputs and outputs are checked for correctness.
+The test bench runs highly randomized tests on the configurations defined in the \texttt{SyncFifo.simConfigMap}. There are two flavors of tests:
+
+\begin{itemize}
+  \item {Directed tests that fill the FIFO with random data and then read back
+        the results to verify that the read data matches the writted data.}
+  \item {Assertion tests that insure that illegal configuration are not
+        compiled.}
+\end{itemize}
 
 \subsection{Code coverage}
 
-The tests exceed the chiselWare minimum standard of 90\% Statement coverage
-and 95\% Branch coverage.
+Code coverage is greater than the chiselWare requirement of 90\% statement
+coverage and 95\% branch coverage.
 
 \subsection{Running simulation}
 
 Simulations can be run directly from the command prompt as follows:
 
-\begin{verbatim}
-  $ sbt "project core" test
-\end{verbatim}
+\texttt{\$ sbt test}
 
 or from make as follows:
 
-\begin{verbatim}
-  $ make test
-\end{verbatim}
+\texttt{\$ make test}

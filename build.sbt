@@ -1,6 +1,6 @@
 // -- Core Configuration ------------------------------------------------------
 val coreNameLc = "syncfifo"
-val coreVersion = "0.1.0"
+val coreVersion = "1.0.0"
 val orgId = "01"
 val teamId = "000"
 val chiselWareVersion = "0.8.0" // chiselWare platform version used (Maven)
@@ -78,6 +78,16 @@ lazy val core = project
     publish / skip := true, // no API for cores
     Compile / mainClass :=
       Some(s"org.chiselware.cores.o$orgId.t$teamId.$coreNameLc.Main"),
-    Compile / doc / skip := false
+    Compile / doc / skip := false,
+    Compile / doc := {
+      val out = (Compile / doc).value
+      val pkgDir =
+        out / "org" / "chiselware" / "cores" / s"o$orgId" / s"t$teamId" /
+          coreNameLc
+      val src = baseDirectory.value / "docs" / "user-guide" / "images"
+      if (src.exists)
+        IO.copyDirectory(src, pkgDir)
+      out
+    }
   )
   .settings(commonSettings)

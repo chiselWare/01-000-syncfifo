@@ -2,7 +2,7 @@
 
 \section{Parameter Descriptions}
 
-The parameters for \textbf{Dff} are shown below in
+The parameters for \textbf{SyncFifo} are shown below in
 Table~\ref{table:params}.
 
 \renewcommand*{\arraystretch}{1.4}
@@ -11,29 +11,51 @@ Table~\ref{table:params}.
     | p{0.10\textwidth}
     | p{0.05\textwidth}
     | p{0.05\textwidth}
-    | p{0.40\textwidth} |
+    | p{0.47\textwidth} |
   }
   \hline
   \textbf{Name} &
   \textbf{Type} &
   \textbf{Min}  &
   \textbf{Max}  &
-  \textbf{Description}              \\ \hline \hline
+  \textbf{Description}            \\ \hline \hline
 
-  width         &
+  externalRam   &
+  Boolean       &
+  false         &
+  true          &
+  Determines whether to build FIFO memory with flip-flops or provide and
+  an external interface to a SRAM \\ \hline
+
+  dataWidth     &
   Int           &
   1             &
   $\ge$ 1       &
-  The data width of the D flip-flop \\ \hline
+  The data width of the FIFO      \\ \hline
+
+  fifoDepth     &
+  Int           &
+  2             &
+  $\ge$ 2       &
+  The depth of the FIRO           \\ \hline
 
   \caption{Parameter Descriptions}\label{table:params}
 \end{longtable}
 
-The Dff is instantiated into a design as follows:
+The SyncFifo is instantiated into a design as follows:
 
 \begin{lstlisting}[language=Scala]
 
-  // Instantiate small register made of flip-flops
-  val myRegister = new Dff(width = 8)
+  // Instantiate small FIFO using internal flip-flops
+  val mySmallFifo = SyncFifo(
+    externalRAM = false, 
+    dataWidth = 8, 
+    fifoDepth = 16) 
+
+  // Instantiate large FIFO using external SRAM
+  val myLargeFifo = SyncFifo(
+    externalRAM = true, 
+    dataWidth = 32, 
+    fifoDepth = 512) 
 
   \end{lstlisting}
